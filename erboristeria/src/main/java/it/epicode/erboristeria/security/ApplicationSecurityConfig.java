@@ -60,6 +60,8 @@ public class ApplicationSecurityConfig {
                         .requestMatchers("/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/categories").authenticated()// <-- Modifica qui
+                        .requestMatchers(HttpMethod.POST, "/products").authenticated()
                         //.requestMatchers(HttpMethod.POST, "/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/users/{id}").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/**").hasAuthority("ADMIN")

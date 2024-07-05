@@ -11,5 +11,5 @@ public class ProductRequestDTO {
     private String description;
     private BigDecimal price;
     private int stock;
-    private Category categoryId;
+    private Long categoryId;
 }

@@ -42,7 +42,7 @@ public class ProductService {
         Product product = new Product();
         BeanUtils.copyProperties(ProductRequestDTO, product);
 
-        Category category = categoryRepository.findById(ProductRequestDTO.getCategoryId().getId())
+        Category category = categoryRepository.findById(ProductRequestDTO.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found for this id :: " + ProductRequestDTO.getCategoryId()));
         product.setCategory(category);
 
@@ -57,7 +57,7 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found for this id :: " + id));
         BeanUtils.copyProperties(ProductRequestDTO, product);
 
-        Category category = categoryRepository.findById(ProductRequestDTO.getCategoryId().getId())
+        Category category = categoryRepository.findById(ProductRequestDTO.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found for this id :: " + ProductRequestDTO.getCategoryId()));
         product.setCategory(category);
 
