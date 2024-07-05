@@ -14,6 +14,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
@@ -30,4 +32,5 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    private String img;
 }
