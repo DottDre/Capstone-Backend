@@ -10,11 +10,10 @@ import java.math.BigDecimal;
 @Data
 public class ProductResponseDTO {
     private Long id;
-
     private String name;
     private String description;
     private BigDecimal price;
     private int stock;
-    private CategoryResponseDTO category;;
-    private MultipartFile imgFile;
+    private CategoryResponseDTO category;
+    private String img;
 }

@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import it.epicode.erboristeria.categories.Category;
 import it.epicode.erboristeria.categories.CategoryRepository;
+import it.epicode.erboristeria.categories.CategoryResponseDTO;
 import it.epicode.erboristeria.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -34,6 +35,15 @@ public class ProductService {
                 .map(product -> {
                     ProductResponseDTO responseDto = new ProductResponseDTO();
                     BeanUtils.copyProperties(product, responseDto);
+
+                    if (product.getCategory() != null) {
+                        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
+                        BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
+                        responseDto.setCategory(categoryResponseDTO);
+                    }
+
+                    responseDto.setImg(product.getImg()); // Set the image URL
+
                     return responseDto;
                 }).collect(Collectors.toList());
     }
@@ -43,8 +53,18 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found for this id :: " + id));
         ProductResponseDTO responseDto = new ProductResponseDTO();
         BeanUtils.copyProperties(product, responseDto);
+
+        if (product.getCategory() != null) {
+            CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
+            BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
+            responseDto.setCategory(categoryResponseDTO);
+        }
+
+        responseDto.setImg(product.getImg()); // Set the image URL
+
         return responseDto;
     }
+
 
     @Transactional
     public ProductResponseDTO create(@Valid ProductRequestDTO productRequestDTO) throws IOException {
@@ -61,8 +81,18 @@ public class ProductService {
         productRepository.save(product);
         ProductResponseDTO responseDto = new ProductResponseDTO();
         BeanUtils.copyProperties(product, responseDto);
+
+        if (product.getCategory() != null) {
+            CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
+            BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
+            responseDto.setCategory(categoryResponseDTO);
+        }
+
+        responseDto.setImg(product.getImg()); // Set the image URL
+
         return responseDto;
     }
+
 
     public ProductResponseDTO modify(Long id, @Valid ProductRequestDTO productRequestDTO) throws IOException {
         Product product = productRepository.findById(id)
@@ -81,6 +111,15 @@ public class ProductService {
         productRepository.save(product);
         ProductResponseDTO responseDto = new ProductResponseDTO();
         BeanUtils.copyProperties(product, responseDto);
+
+        if (product.getCategory() != null) {
+            CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
+            BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
+            responseDto.setCategory(categoryResponseDTO);
+        }
+
+        responseDto.setImg(product.getImg()); // Set the image URL
+
         return responseDto;
     }
 
