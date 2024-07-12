@@ -3,6 +3,7 @@ package it.epicode.erboristeria.security;
 import it.epicode.erboristeria.users.Role;
 import it.epicode.erboristeria.users.User;
 import it.epicode.erboristeria.users.UserRepository;
+import it.epicode.erboristeria.users.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,8 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder encoder;
+     @Autowired
+    UserService userService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -45,8 +48,10 @@ public class AuthController {
 
         // Ottieni le informazioni sull'utente autenticato dall'oggetto Authentication
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        Role role = userService.findUserRoleByUsername(username); // Ottieni il ruolo dell'utente dal servizio o repository
 
-        return ResponseEntity.ok(new LoginResponseDTO(userDetails.getUsername(), jwt));
+        return ResponseEntity.ok(new LoginResponseDTO(username, jwt, role));
     }
 
 

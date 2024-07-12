@@ -3,7 +3,6 @@ package it.epicode.erboristeria.Products;
 
 import it.epicode.erboristeria.categories.CategoryResponseDTO;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -14,6 +13,6 @@ public class ProductResponseDTO {
     private String description;
     private BigDecimal price;
     private int stock;
-    private CategoryResponseDTO category;
-    private String img;
+    private CategoryResponseDTO categoryId;
+    private String imgFile;
 }

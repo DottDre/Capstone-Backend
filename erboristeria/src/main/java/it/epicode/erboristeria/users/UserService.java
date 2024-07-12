@@ -64,5 +64,10 @@ public class UserService {
         userRepository.deleteById(id);
         return "User deleted";
     }
+    public Role findUserRoleByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username :: " + username));
+        return user.getRole(); // Supponendo che `getRole()` restituisca il ruolo dell'utente
+    }
 }
 

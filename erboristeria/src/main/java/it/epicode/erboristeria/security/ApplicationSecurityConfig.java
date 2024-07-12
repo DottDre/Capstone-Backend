@@ -62,10 +62,11 @@ public class ApplicationSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/categories").authenticated()// <-- Modifica qui
                         .requestMatchers(HttpMethod.POST, "/products").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/orders").authenticated()
                         //.requestMatchers(HttpMethod.POST, "/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/users/{id}").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

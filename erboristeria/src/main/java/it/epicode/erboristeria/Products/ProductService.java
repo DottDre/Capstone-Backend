@@ -39,10 +39,10 @@ public class ProductService {
                     if (product.getCategory() != null) {
                         CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
                         BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
-                        responseDto.setCategory(categoryResponseDTO);
+                        responseDto.setCategoryId(categoryResponseDTO);
                     }
 
-                    responseDto.setImg(product.getImg()); // Set the image URL
+                    responseDto.setImgFile(product.getImg()); // Set the image URL
 
                     return responseDto;
                 }).collect(Collectors.toList());
@@ -57,10 +57,10 @@ public class ProductService {
         if (product.getCategory() != null) {
             CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
             BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
-            responseDto.setCategory(categoryResponseDTO);
+            responseDto.setCategoryId(categoryResponseDTO);
         }
 
-        responseDto.setImg(product.getImg()); // Set the image URL
+        responseDto.setImgFile(product.getImg()); // Set the image URL
 
         return responseDto;
     }
@@ -85,40 +85,51 @@ public class ProductService {
         if (product.getCategory() != null) {
             CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
             BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
-            responseDto.setCategory(categoryResponseDTO);
+            responseDto.setCategoryId(categoryResponseDTO);
         }
 
-        responseDto.setImg(product.getImg()); // Set the image URL
+        responseDto.setImgFile(product.getImg()); // Set the image URL
 
         return responseDto;
     }
 
 
+    @Transactional
     public ProductResponseDTO modify(Long id, @Valid ProductRequestDTO productRequestDTO) throws IOException {
+        // 1. Controlla se il prodotto con l'ID specificato esiste nel database
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found for this id :: " + id));
+
+        // 2. Copia le proprietà dal DTO ricevuto al prodotto esistente
         BeanUtils.copyProperties(productRequestDTO, product);
 
-        Category category = categoryRepository.findById(productRequestDTO.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found for this id :: " + productRequestDTO.getCategoryId()));
-        product.setCategory(category);
+        // 3. Recupera la categoria associata dal repository, se il categoryId è presente nel DTO
+        if (productRequestDTO.getCategoryId() != null) {
+            Category category = categoryRepository.findById(productRequestDTO.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found for this id :: " + productRequestDTO.getCategoryId()));
+            product.setCategory(category);
+        }
 
+        // 4. Carica l'immagine solo se è stata fornita nel DTO
         if (productRequestDTO.getImgFile() != null && !productRequestDTO.getImgFile().isEmpty()) {
             String imgUrl = uploadImage(productRequestDTO.getImgFile());
             product.setImg(imgUrl);
         }
 
+        // 5. Salva le modifiche nel repository
         productRepository.save(product);
+
+        // 6. Prepara la risposta da ritornare al client
         ProductResponseDTO responseDto = new ProductResponseDTO();
         BeanUtils.copyProperties(product, responseDto);
 
         if (product.getCategory() != null) {
             CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO();
             BeanUtils.copyProperties(product.getCategory(), categoryResponseDTO);
-            responseDto.setCategory(categoryResponseDTO);
+            responseDto.setCategoryId(categoryResponseDTO);
         }
 
-        responseDto.setImg(product.getImg()); // Set the image URL
+        responseDto.setImgFile(product.getImg()); // Set the image URL
 
         return responseDto;
     }
