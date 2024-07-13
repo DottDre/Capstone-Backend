@@ -2,12 +2,15 @@ package it.epicode.erboristeria.orders;
 
 import it.epicode.erboristeria.Products.Product;
 import it.epicode.erboristeria.Products.ProductRepository;
+import it.epicode.erboristeria.Products.ProductResponseDTO;
 import it.epicode.erboristeria.exception.ResourceNotFoundException;
 import it.epicode.erboristeria.orders_item.OrderItem;
 import it.epicode.erboristeria.orders_item.OrderItemRequestDTO;
+import it.epicode.erboristeria.orders_item.OrderItemResponseDTO;
 import it.epicode.erboristeria.users.User;
 import it.epicode.erboristeria.users.UserRepository;
 
+import it.epicode.erboristeria.users.UserResponseDTO;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +41,31 @@ public class OrderService {
                 .map(order -> {
                     OrderResponseDTO responseDto = new OrderResponseDTO();
                     BeanUtils.copyProperties(order, responseDto);
+
+                    if (order.getUser() != null) {
+                        UserResponseDTO userResponseDTO = new UserResponseDTO();
+                        BeanUtils.copyProperties(order.getUser(), userResponseDTO);
+                        responseDto.setUser(userResponseDTO);
+                    }
+
+                    if (order.getOrderItems() != null) {
+                        List<OrderItemResponseDTO> orderItemResponseDTOs = order.getOrderItems().stream()
+                                .map(orderItem -> {
+                                    OrderItemResponseDTO orderItemResponseDTO = new OrderItemResponseDTO();
+                                    BeanUtils.copyProperties(orderItem, orderItemResponseDTO);
+
+                                    if (orderItem.getProduct() != null) {
+                                        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+                                        BeanUtils.copyProperties(orderItem.getProduct(), productResponseDTO);
+                                        orderItemResponseDTO.setProduct(productResponseDTO);
+                                    }
+
+                                    return orderItemResponseDTO;
+                                })
+                                .collect(Collectors.toList());
+                        responseDto.setOrderItems(orderItemResponseDTOs);
+                    }
+
                     return responseDto;
                 }).collect(Collectors.toList());
     }
@@ -47,30 +75,55 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found for this id :: " + id));
         OrderResponseDTO responseDto = new OrderResponseDTO();
         BeanUtils.copyProperties(order, responseDto);
+
+        if (order.getUser() != null) {
+            UserResponseDTO userResponseDTO = new UserResponseDTO();
+            BeanUtils.copyProperties(order.getUser(), userResponseDTO);
+            responseDto.setUser(userResponseDTO);
+        }
+
+        if (order.getOrderItems() != null) {
+            List<OrderItemResponseDTO> orderItemResponseDTOs = order.getOrderItems().stream()
+                    .map(orderItem -> {
+                        OrderItemResponseDTO orderItemResponseDTO = new OrderItemResponseDTO();
+                        BeanUtils.copyProperties(orderItem, orderItemResponseDTO);
+
+                        if (orderItem.getProduct() != null) {
+                            ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+                            BeanUtils.copyProperties(orderItem.getProduct(), productResponseDTO);
+                            orderItemResponseDTO.setProduct(productResponseDTO);
+                        }
+
+                        return orderItemResponseDTO;
+                    })
+                    .collect(Collectors.toList());
+            responseDto.setOrderItems(orderItemResponseDTOs);
+        }
+
         return responseDto;
     }
+
     @Transactional
     public Order create(OrderRequestDTO orderRequestDTO) {
         Order order = new Order();
 
-
         User user = userRepository.findById(orderRequestDTO.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found for this id :: " + orderRequestDTO.getUserId()));
         order.setUser(user);
         order.setOrderDate(LocalDate.now());
 
-        List<OrderItem> orderItems = orderRequestDTO.getOrderItems().stream()
-                .map(itemRequest -> {
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setProductId(itemRequest.getProductId());
-                    orderItem.setQuantity(itemRequest.getQuantity());
-                    Product product = productRepository.findById(itemRequest.getProductId())
-                            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-                    orderItem.setPrice(product.getPrice().multiply(new BigDecimal(itemRequest.getQuantity())));
-                    orderItem.setOrder(order);
-                    return orderItem;
-                })
-                .collect(Collectors.toList());
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (OrderItemRequestDTO itemRequest : orderRequestDTO.getOrderItems()) {
+            Product product = productRepository.findById(itemRequest.getProductId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found for this id :: " + itemRequest.getProductId()));
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(product);
+            orderItem.setQuantity(itemRequest.getQuantity());
+            orderItem.setPrice(product.getPrice().multiply(new BigDecimal(itemRequest.getQuantity())));
+            orderItem.setOrder(order);
+            orderItems.add(orderItem);
+        }
 
         BigDecimal totalAmount = orderItems.stream()
                 .map(OrderItem::getPrice)
@@ -108,6 +161,31 @@ public class OrderService {
         orderRepository.save(order);
         OrderResponseDTO responseDto = new OrderResponseDTO();
         BeanUtils.copyProperties(order, responseDto);
+
+        if (order.getUser() != null) {
+            UserResponseDTO userResponseDTO = new UserResponseDTO();
+            BeanUtils.copyProperties(order.getUser(), userResponseDTO);
+            responseDto.setUser(userResponseDTO);
+        }
+
+        if (order.getOrderItems() != null) {
+            List<OrderItemResponseDTO> orderItemResponseDTOs = order.getOrderItems().stream()
+                    .map(orderItem -> {
+                        OrderItemResponseDTO orderItemResponseDTO = new OrderItemResponseDTO();
+                        BeanUtils.copyProperties(orderItem, orderItemResponseDTO);
+
+                        if (orderItem.getProduct() != null) {
+                            ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+                            BeanUtils.copyProperties(orderItem.getProduct(), productResponseDTO);
+                            orderItemResponseDTO.setProduct(productResponseDTO);
+                        }
+
+                        return orderItemResponseDTO;
+                    })
+                    .collect(Collectors.toList());
+            responseDto.setOrderItems(orderItemResponseDTOs);
+        }
+
         return responseDto;
     }
 
